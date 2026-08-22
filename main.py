@@ -13,11 +13,12 @@ class MyGithubStats:
     HEADERS     : str = ''
 
     def __init__(self):
-        self._repos      : list[dict]     = []
-        self._len_repos  : int            = 0
-        self._stars      : int            = 0
-        self._commits    : int            = 0
-        self._lang_bytes : dict[str, int] = {}
+        self._repos               : list[dict]     = []
+        self._len_repos           : int            = 0
+        self._stars               : int            = 0
+        self._commits             : int            = 0
+        self._lang_bytes          : dict[str, int] = {}
+        self._total_contributions : int            = 0
         self._set_headers()
 
 
@@ -52,8 +53,7 @@ class MyGithubStats:
 
     def execute(self):
         try:
-            self._get_data_from_github()
-            self._get_repo_data()
+            self._get_data()
             self._process_data()
             self._display()
         except Exception as e:
@@ -61,7 +61,14 @@ class MyGithubStats:
 
 
 
-    def _get_data_from_github(self):
+    def _get_data(self):
+        self._get_repo_basic_data()
+        self._get_repo_langs_and_commits()
+        self._get_total_contributions()
+
+
+
+    def _get_repo_basic_data(self):
         PER_PAGE = 100
         page     = 1
         URL      = f'https://api.github.com/users/{self.USERNAME}/repos'
@@ -87,7 +94,7 @@ class MyGithubStats:
 
 
 
-    def _get_repo_data(self):
+    def _get_repo_langs_and_commits(self):
         for idx, repo in enumerate(self._repos, 1):
             repo_name = repo['name']
             print(f'  ({idx}/{len(self._repos)}) Processing {repo_name}...')
@@ -132,6 +139,40 @@ class MyGithubStats:
 
 
 
+    def _get_total_contributions(self):
+        GRAPHQL_URL = "https://api.github.com/graphql"
+        
+        query = """
+            query($username: String!) {
+              user(login: $username) {
+                contributionsCollection {
+                  contributionCalendar {
+                    totalContributions
+                  }
+                }
+              }
+            }
+            """
+        
+        variables = {"username": self.USERNAME}
+        response  = requests.post(
+            GRAPHQL_URL, 
+            json={'query': query, 'variables': variables}, 
+            headers=self.HEADERS
+        )
+        
+        if response.status_code != 200:
+            print(f"Unable to get contributions via GraphQL: {response.status_code}")
+            return
+
+        try:
+            data = response.json()
+            self._total_contributions = int(data['data']['user']['contributionsCollection']['contributionCalendar']['totalContributions'])
+        except (Exception, KeyError, TypeError) as e:
+            print(f'Unable to get total contributions: {e}')
+
+
+
     def _process_data(self):
         if len(self._repos) == 0:
             self._fatal('No repository found')
@@ -165,6 +206,7 @@ class MyGithubStats:
         print(f'repos: {self._len_repos}')
         print(f'stars: {self._stars}')
         print(f'commits: {self._commits}')
+        print(f'contributions: {self._total_contributions}')
         self._process_langs()        
 
 
