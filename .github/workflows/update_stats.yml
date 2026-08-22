@@ -32,17 +32,7 @@ jobs:
       - name: Run stats script
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
-        run: |
-          python main.py
+        run: python main.py
 
       - name: Commit and push if changed
-        run: |
-          git config --global --add safe.directory /__w/github-stats/github-stats
-
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          
-          git status
-          git add languages_stats.svg
-          
-          git diff --staged --quiet || (git commit -m "chore: update languages stats SVG [skip ci]" && git push)
+        run: bash update.sh
