@@ -25,7 +25,7 @@ jobs:
       - name: Run stats script
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
-        run: ./venv/bin/python main.py
+        run: ./venv/bin/python ./src/main.py
 
       - name: Commit and push if changed
         run: bash bash/update.sh
