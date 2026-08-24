@@ -13,13 +13,15 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import os
 from dataclasses import dataclass, field
+from utils       import fatal
 
 
 
 @dataclass(slots=True)
 class Data:
-    USERNAME            : str            = 'olivercalazans'
+    USERNAME            : str            = ''
     TOTAL_LANGS         : int            = 10
     lang_bytes          : dict[str, int] = field(default_factory=dict)
     len_repos           : int            = 0
@@ -27,3 +29,18 @@ class Data:
     total_stars         : int            = 0
     total_commits       : int            = 0
     total_contributions : int            = 0
+
+
+
+    def get_user_name(self):
+        repo = os.getenv("GITHUB_REPOSITORY", None)
+
+        if not repo:
+            fatal('Unable to get username from system')
+
+        username = repo.split("/")[0] if repo else None
+
+        if not username:
+            fatal(f'Invalid repository name: {repo}')
+
+        self.USERNAME = username
