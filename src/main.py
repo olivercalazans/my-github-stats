@@ -21,6 +21,7 @@ from svg_builder    import SVGBuilder
 
 def main():
     data = Data()
+    data.get_user_name()
 
     fetcher = Fetcher(data)
     fetcher.fetch_data()
