@@ -24,6 +24,8 @@ from utils  import fatal, warning
 
 class Fetcher:
 
+    RETRY = 3
+
     __slots__ = ('data', 'HEADERS')
 
     def __init__(self, data: Data):
@@ -57,6 +59,7 @@ class Fetcher:
     def fetch_data(self):
         try:
             self._get_data()
+            self._valid_len_repos()
             self._process_data()
             #self._display()
         except Exception as e:
@@ -97,10 +100,20 @@ class Fetcher:
 
 
 
+    def _valid_len_repos(self):
+        len_repos = len(self.data.repos)
+        
+        if len_repos == 0:
+            fatal('No repository found')
+        
+        self.data.len_repos = len_repos
+
+
+
     def _get_repo_langs_and_commits(self):
         for idx, repo in enumerate(self.data.repos, 1):
             repo_name = repo['name']
-            print(f'  ({idx}/{len(self.data.repos)}) Processing {repo_name}...')
+            print(f'({idx}/{self.data.len_repos}) Processing {repo_name}...')
 
             self._get_repo_lang_bytes(repo_name)         
             self._get_repo_commits(repo_name)   
@@ -109,37 +122,42 @@ class Fetcher:
 
     def _get_repo_lang_bytes(self, repo_name: str):
         lang_url = f'https://api.github.com/repos/{self.data.USERNAME}/{repo_name}/languages'
-        response = requests.get(lang_url, headers=self.HEADERS)
 
-        if response.status_code != 200:
-            warning(f' Unable to get {repo_name} language: {response.status_code}')
-            return
+        for i in range(1, self.RETRY + 1):
+            response = requests.get(lang_url, headers=self.HEADERS)
 
-        langs: dict = response.json()
-        for lang, bytes_count in langs.items():
-            self.data.lang_bytes[lang] = self.data.lang_bytes.get(lang, 0) + bytes_count
+            if response.status_code != 200:
+                warning(f"  - {i}/{self.RETRY} attempt failed. Response code: {response.status_code}")
+                time.sleep(2)
+                continue
+
+            langs: dict = response.json()
+            for lang, bytes_count in langs.items():
+                self.data.lang_bytes[lang] = self.data.lang_bytes.get(lang, 0) + bytes_count
+                return
+
+        fatal(f'Unable to get {repo_name} language')
 
 
 
     def _get_repo_commits(self, repo_name: str):
-        RETRYS      = 3
-        commits_url = f'https://api.github.com/repos/{self.data.USERNAME}/{repo_name}/stats/contributors'
+        commits_url   = f'https://api.github.com/repos/{self.data.USERNAME}/{repo_name}/stats/contributors'
 
-        for _ in range(RETRYS):
+        for i in range(1, self.RETRY + 1):
             response = requests.get(commits_url, headers=self.HEADERS)
 
-            if response.status_code == 202:
+            if response.status_code != 200:
+                warning(f"  {i}/{self.RETRY} attempt failed. Response code: {response.status_code}")
                 time.sleep(2)
                 continue
 
-            if response.status_code == 200:
-                contributors   = response.json()
-                total_commits  = sum(c['total'] for c in contributors)
+            contributors  = response.json()
+            total_commits = sum(c['total'] for c in contributors)
 
-                self.data.total_commits += total_commits
-                return
+            self.data.total_commits += total_commits
+            return
 
-        warning(f'Unable to get {repo_name} commits after {RETRYS} retrys: {response.status_code}')
+        fatal(f'Unable to get {repo_name} commits')
 
 
 
@@ -178,12 +196,6 @@ class Fetcher:
 
 
     def _process_data(self):
-        len_repos = len(self.data.repos)
-
-        if len_repos == 0:
-            fatal('No repository found')
-
-        self.data.len_repos = len_repos
         self._get_stars()
 
 
