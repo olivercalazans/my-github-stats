@@ -18,7 +18,7 @@ import requests
 import time
 from data   import Data
 from dotenv import load_dotenv
-from utils  import fatal, warning
+from utils  import fatal, info, warning
 
 
 
@@ -58,20 +58,15 @@ class Fetcher:
 
     def fetch_data(self):
         try:
-            self._get_data()
+            self._get_repo_basic_data()
             self._valid_len_repos()
+            self._get_repo_langs_and_commits()
+            #self._get_total_contributions()
             self._process_data()
             #self._display()
         except Exception as e:
             fatal(str(e))
-
-
-
-    def _get_data(self):
-        self._get_repo_basic_data()
-        self._get_repo_langs_and_commits()
-        #self._get_total_contributions()
-
+        
 
 
     def _get_repo_basic_data(self):
@@ -113,7 +108,7 @@ class Fetcher:
     def _get_repo_langs_and_commits(self):
         for idx, repo in enumerate(self.data.repos, 1):
             repo_name = repo['name']
-            print(f'({idx}/{self.data.len_repos}) Processing {repo_name}...')
+            info(f'({idx}/{self.data.len_repos}) Processing {repo_name}...')
 
             self._get_repo_lang_bytes(repo_name)         
             self._get_repo_commits(repo_name)   
@@ -136,12 +131,12 @@ class Fetcher:
                 self.data.lang_bytes[lang] = self.data.lang_bytes.get(lang, 0) + bytes_count
                 return
 
-        fatal(f'Unable to get {repo_name} language')
+        fatal(f'Unable to get {repo_name} languages')
 
 
 
     def _get_repo_commits(self, repo_name: str):
-        commits_url   = f'https://api.github.com/repos/{self.data.USERNAME}/{repo_name}/stats/contributors'
+        commits_url = f'https://api.github.com/repos/{self.data.USERNAME}/{repo_name}/stats/contributors'
 
         for i in range(1, self.RETRY + 1):
             response = requests.get(commits_url, headers=self.HEADERS)
