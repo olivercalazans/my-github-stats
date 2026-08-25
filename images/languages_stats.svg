@@ -11,16 +11,16 @@
   <svg x="20" y="50" width="260" height="10">
     <mask id="bar-mask"><rect width="260" height="10" rx="5" fill="#fff"/></mask>
     <g mask="url(#bar-mask)">
-    <rect x="0" y="0" width="150.96819117966078" height="10" fill="#00ADD8" rx="2" ry="2"/>
-    <rect x="150.96819117966078" y="0" width="74.29198124198219" height="10" fill="#3572A5" rx="2" ry="2"/>
-    <rect x="225.26017242164295" y="0" width="24.371496597364132" height="10" fill="#3D6117" rx="2" ry="2"/>
-    <rect x="249.6316690190071" y="0" width="7.866422773154931" height="10" fill="#012456" rx="2" ry="2"/>
-    <rect x="257.49809179216203" y="0" width="2.5019082078379804" height="10" fill="#89e051" rx="2" ry="2"/>
+    <rect x="0" y="0" width="150.83528668828737" height="10" fill="#00ADD8" rx="2" ry="2"/>
+    <rect x="150.83528668828737" y="0" width="74.49373320917489" height="10" fill="#3572A5" rx="2" ry="2"/>
+    <rect x="225.32901989746227" y="0" width="24.350041207762043" height="10" fill="#3D6117" rx="2" ry="2"/>
+    <rect x="249.67906110522432" y="0" width="7.859497586402509" height="10" fill="#012456" rx="2" ry="2"/>
+    <rect x="257.5385586916268" y="0" width="2.461441308373203" height="10" fill="#89e051" rx="2" ry="2"/>
     </g>
   </svg>
-  <g transform="translate(20, 85)">    <circle cx="4" cy="4" r="4" fill="#00ADD8"/>    <text x="14" y="8">Go (58.1%)</text>  </g>
-  <g transform="translate(150, 85)">    <circle cx="4" cy="4" r="4" fill="#3572A5"/>    <text x="14" y="8">Python (28.6%)</text>  </g>
+  <g transform="translate(20, 85)">    <circle cx="4" cy="4" r="4" fill="#00ADD8"/>    <text x="14" y="8">Go (58.0%)</text>  </g>
+  <g transform="translate(150, 85)">    <circle cx="4" cy="4" r="4" fill="#3572A5"/>    <text x="14" y="8">Python (28.7%)</text>  </g>
   <g transform="translate(20, 105)">    <circle cx="4" cy="4" r="4" fill="#3D6117"/>    <text x="14" y="8">TeX (9.4%)</text>  </g>
   <g transform="translate(150, 105)">    <circle cx="4" cy="4" r="4" fill="#012456"/>    <text x="14" y="8">PowerShell (3.0%)</text>  </g>
-  <g transform="translate(20, 125)">    <circle cx="4" cy="4" r="4" fill="#89e051"/>    <text x="14" y="8">Shell (1.0%)</text>  </g>
+  <g transform="translate(20, 125)">    <circle cx="4" cy="4" r="4" fill="#89e051"/>    <text x="14" y="8">Shell (0.9%)</text>  </g>
 </svg>
