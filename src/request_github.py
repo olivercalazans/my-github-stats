@@ -18,7 +18,7 @@ import requests
 import time
 from data   import Data
 from dotenv import load_dotenv
-from utils  import fatal, info, warning
+from display  import fatal, info
 
 
 
@@ -106,53 +106,68 @@ class Fetcher:
 
 
     def _get_repo_langs_and_commits(self):
+        missed_langs   = []
+        missed_commits = []
+
         for idx, repo in enumerate(self.data.repos, 1):
             repo_name = repo['name']
             info(f'({idx}/{self.data.len_repos}) Processing {repo_name}...')
 
-            self._get_repo_lang_bytes(repo_name)         
-            self._get_repo_commits(repo_name)   
+            if not self._get_repo_lang_bytes(repo_name):
+                missed_langs.append(repo_name)
+
+            if not self._get_repo_commits(repo_name):
+                missed_commits.append(repo_name)
+
+
+        for repo_name in missed_langs:
+            if not self._get_repo_lang_bytes(repo_name, 5):
+                fatal(f'Unable to get {repo_name} languages')
+
+        for repo_name in missed_commits:
+            if not self._get_repo_commits(repo_name, 5):
+                fatal(f'Unable to get {repo_name} commits')
 
 
 
-    def _get_repo_lang_bytes(self, repo_name: str):
+    def _get_repo_lang_bytes(self, repo_name: str, delay=2) -> bool:
         lang_url = f'https://api.github.com/repos/{self.data.USERNAME}/{repo_name}/languages'
 
         for i in range(1, self.RETRY + 1):
             response = requests.get(lang_url, headers=self.HEADERS)
 
             if response.status_code != 200:
-                warning(f"  - {i}/{self.RETRY} attempt failed. Response code: {response.status_code}")
-                time.sleep(2)
+                info(f"  - {i}/{self.RETRY} attempt failed. Response code: {response.status_code}")
+                time.sleep(delay)
                 continue
 
             langs: dict = response.json()
             for lang, bytes_count in langs.items():
                 self.data.lang_bytes[lang] = self.data.lang_bytes.get(lang, 0) + bytes_count
-                return
+                return True
 
-        fatal(f'Unable to get {repo_name} languages')
+        return False
 
 
 
-    def _get_repo_commits(self, repo_name: str):
+    def _get_repo_commits(self, repo_name: str, delay=2) -> bool:
         commits_url = f'https://api.github.com/repos/{self.data.USERNAME}/{repo_name}/stats/contributors'
 
         for i in range(1, self.RETRY + 1):
             response = requests.get(commits_url, headers=self.HEADERS)
 
             if response.status_code != 200:
-                warning(f"  {i}/{self.RETRY} attempt failed. Response code: {response.status_code}")
-                time.sleep(2)
+                info(f"  {i}/{self.RETRY} attempt failed. Response code: {response.status_code}")
+                time.sleep(delay)
                 continue
 
             contributors  = response.json()
             total_commits = sum(c['total'] for c in contributors)
 
             self.data.total_commits += total_commits
-            return
+            return True
 
-        fatal(f'Unable to get {repo_name} commits')
+        return False
 
 
 
@@ -179,14 +194,14 @@ class Fetcher:
         )
         
         if response.status_code != 200:
-            warning(f"Unable to get contributions via GraphQL: {response.status_code}")
+            info(f"Unable to get contributions via GraphQL: {response.status_code}")
             return
 
         try:
             data = response.json()
             self.data.total_contributions = int(data['data']['user']['contributionsCollection']['contributionCalendar']['totalContributions'])
         except (Exception, KeyError, TypeError) as e:
-            warning(f'Unable to get total contributions: {e}')
+            info(f'Unable to get total contributions: {e}')
 
 
 

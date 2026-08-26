@@ -37,9 +37,3 @@ def fatal(err: str):
 def info(msg: str):
     date = get_datetime()
     print(f'{date} {msg}')
-
-
-
-def warning(msg: str):
-    date = get_datetime()
-    print(f'{date} {msg}')
