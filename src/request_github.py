@@ -119,12 +119,19 @@ class Fetcher:
             if not self._get_repo_commits(repo_name):
                 missed_commits.append(repo_name)
 
+        if len(missed_langs) > 0 or len(missed_commits) > 0:
+            self._retries_missed_langs_and_commits(missed_langs, missed_commits)
 
+
+
+    def _retries_missed_langs_and_commits(self, missed_langs: dict, missed_commits:dict):
         for repo_name in missed_langs:
+            info(f'Retrying missed languages from {repo_name}')
             if not self._get_repo_lang_bytes(repo_name, 5):
                 fatal(f'Unable to get {repo_name} languages')
 
         for repo_name in missed_commits:
+            info(f'Retrying missed commits from {repo_name}')
             if not self._get_repo_commits(repo_name, 5):
                 fatal(f'Unable to get {repo_name} commits')
 
@@ -144,7 +151,8 @@ class Fetcher:
             langs: dict = response.json()
             for lang, bytes_count in langs.items():
                 self.data.lang_bytes[lang] = self.data.lang_bytes.get(lang, 0) + bytes_count
-                return True
+
+            return True
 
         return False
 
