@@ -114,9 +114,11 @@ class Fetcher:
             info(f'({idx}/{self.data.len_repos}) Processing {repo_name}...')
 
             if not self._get_repo_lang_bytes(repo_name):
+                info(f'Failed to get {repo_name} languages. Added to retry list')
                 missed_langs.append(repo_name)
 
             if not self._get_repo_commits(repo_name):
+                info(f'Failed to get {repo_name} commits. Added to retry list')
                 missed_commits.append(repo_name)
 
         if len(missed_langs) > 0 or len(missed_commits) > 0:
