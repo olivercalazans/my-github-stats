@@ -13,9 +13,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import NamedTuple
-from data   import Data
-from utils  import warning
+from typing  import NamedTuple
+from data    import Data
+from display import info
 
 
 
@@ -65,7 +65,7 @@ class SVGBuilder:
         total_bytes  = sum(self.data.lang_bytes.values())
 
         if total_bytes == 0:
-            warning("No language found for SVG generation")
+            info("No language found for SVG generation")
             return
 
         width      = 300

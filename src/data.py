@@ -15,7 +15,7 @@
 
 import os
 from dataclasses import dataclass, field
-from utils       import fatal
+from display     import fatal
 
 
 

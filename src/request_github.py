@@ -16,9 +16,9 @@
 import os
 import requests
 import time
-from data   import Data
-from dotenv import load_dotenv
-from display  import fatal, info
+from data    import Data
+from dotenv  import load_dotenv
+from display import fatal, info
 
 
 
