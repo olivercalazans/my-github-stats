@@ -21,10 +21,9 @@ from dotenv  import load_dotenv
 from display import fatal, info
 
 
-
 class Fetcher:
 
-    RETRY = 3
+    RETRY: int = 3
 
     __slots__ = ('data', 'HEADERS')
 
@@ -35,8 +34,9 @@ class Fetcher:
 
 
 
-    def _set_headers(self): 
+    def _set_headers(self):
         token = self._get_token()
+
         self.HEADERS = {
             'Authorization': f'Bearer {token}',
             'Accept': 'application/vnd.github.v3+json',
@@ -48,28 +48,28 @@ class Fetcher:
     def _get_token() -> str:
         load_dotenv()
         token = os.getenv('GITHUB_TOKEN')
-    
+
         if not token:
             fatal('Unable to get token')
-    
+
         return token
 
 
 
     def fetch_data(self):
         try:
-            self._get_repo_basic_data()
+            self._get_public_repos()
             self._valid_len_repos()
-            self._get_repo_langs_and_commits()
-            #self._get_total_contributions()
-            self._process_data()
+            self._get_repo_languages()
+            self._get_contributions()
+            self._get_stars()
             #self._display()
         except Exception as e:
             fatal(str(e))
-        
 
 
-    def _get_repo_basic_data(self):
+
+    def _get_public_repos(self):
         PER_PAGE = 100
         page     = 1
         URL      = f'https://api.github.com/users/{self.data.USERNAME}/repos'
@@ -82,7 +82,12 @@ class Fetcher:
                 'page': page,
             }
 
-            response = requests.get(URL, headers=self.HEADERS, params=params)
+            response = requests.get(
+                URL,
+                headers=self.HEADERS,
+                params=params
+            )
+
             response.raise_for_status()
             repos = response.json()
 
@@ -97,62 +102,64 @@ class Fetcher:
 
     def _valid_len_repos(self):
         len_repos = len(self.data.repos)
-        
+
         if len_repos == 0:
             fatal('No repository found')
-        
+
         self.data.len_repos = len_repos
 
 
 
-    def _get_repo_langs_and_commits(self):
-        missed_langs   = []
-        missed_commits = []
+    def _get_repo_languages(self):
+        missed_langs = []
 
         for idx, repo in enumerate(self.data.repos, 1):
             repo_name = repo['name']
+
             info(f'({idx}/{self.data.len_repos}) Processing {repo_name}...')
 
             if not self._get_repo_lang_bytes(repo_name):
-                info(f'Failed to get {repo_name} languages. Added to retry list')
                 missed_langs.append(repo_name)
 
-            if not self._get_repo_commits(repo_name):
-                info(f'Failed to get {repo_name} commits. Added to retry list')
-                missed_commits.append(repo_name)
-
-        if len(missed_langs) > 0 or len(missed_commits) > 0:
-            self._retries_missed_langs_and_commits(missed_langs, missed_commits)
+        if missed_langs:
+            self._retry_missed_languages(missed_langs)
 
 
 
-    def _retries_missed_langs_and_commits(self, missed_langs: dict, missed_commits:dict):
+    def _retry_missed_languages(self, missed_langs: list):
         for repo_name in missed_langs:
             info(f'Retrying missed languages from {repo_name}')
+
             if not self._get_repo_lang_bytes(repo_name, 5):
                 fatal(f'Unable to get {repo_name} languages')
 
-        for repo_name in missed_commits:
-            info(f'Retrying missed commits from {repo_name}')
-            if not self._get_repo_commits(repo_name, 5):
-                fatal(f'Unable to get {repo_name} commits')
 
 
+    def _get_repo_lang_bytes(
+        self,
+        repo_name : str,
+        delay     : int = 2
+    ) -> bool:
 
-    def _get_repo_lang_bytes(self, repo_name: str, delay=2) -> bool:
         lang_url = f'https://api.github.com/repos/{self.data.USERNAME}/{repo_name}/languages'
 
         for i in range(1, self.RETRY + 1):
-            response = requests.get(lang_url, headers=self.HEADERS)
+            response = requests.get(
+                lang_url,
+                headers=self.HEADERS
+            )
 
             if response.status_code != 200:
-                info(f"  - {i}/{self.RETRY} attempt failed. Response code: {response.status_code}")
+                info(f'  - {i}/{self.RETRY} attempt failed. Response code: {response.status_code}')
                 time.sleep(delay)
                 continue
 
             langs: dict = response.json()
+
             for lang, bytes_count in langs.items():
-                self.data.lang_bytes[lang] = self.data.lang_bytes.get(lang, 0) + bytes_count
+                self.data.lang_bytes[lang] = (
+                    self.data.lang_bytes.get(lang, 0) + bytes_count
+                )
 
             return True
 
@@ -160,75 +167,116 @@ class Fetcher:
 
 
 
-    def _get_repo_commits(self, repo_name: str, delay=2) -> bool:
-        commits_url = f'https://api.github.com/repos/{self.data.USERNAME}/{repo_name}/stats/contributors'
+    def _get_contributions(self):
+        GRAPHQL_URL = 'https://api.github.com/graphql'
 
-        for i in range(1, self.RETRY + 1):
-            response = requests.get(commits_url, headers=self.HEADERS)
-
-            if response.status_code != 200:
-                info(f"  {i}/{self.RETRY} attempt failed. Response code: {response.status_code}")
-                time.sleep(delay)
-                continue
-
-            contributors  = response.json()
-            total_commits = sum(c['total'] for c in contributors)
-
-            self.data.total_commits += total_commits
-            return True
-
-        return False
-
-
-
-    def _get_total_contributions(self):
-        GRAPHQL_URL = "https://api.github.com/graphql"
-        
         query = """
             query($username: String!) {
-              user(login: $username) {
-                contributionsCollection {
-                  contributionCalendar {
-                    totalContributions
-                  }
+                user(login: $username) {
+
+                    issues {
+                        totalCount
+                    }
+
+                    pullRequests {
+                        totalCount
+                    }
+
+                    contributionsCollection {
+
+                        contributionCalendar {
+                            totalContributions
+                        }
+
+                        totalCommitContributions
+                        totalIssueContributions
+                        totalPullRequestContributions
+                        totalPullRequestReviewContributions
+                    }
                 }
-              }
             }
-            """
-        
-        variables = {"username": self.data.USERNAME}
-        response  = requests.post(
-            GRAPHQL_URL, 
-            json={'query': query, 'variables': variables}, 
+        """
+
+        variables = { 'username': self.data.USERNAME }
+
+        response = requests.post(
+            GRAPHQL_URL,
+            json={
+                'query': query,
+                'variables': variables
+            },
             headers=self.HEADERS
         )
-        
+
         if response.status_code != 200:
-            info(f"Unable to get contributions via GraphQL: {response.status_code}")
+            fatal(f'Unable to get contributions via GraphQL: {response.status_code}')
             return
 
         try:
-            data = response.json()
-            self.data.total_contributions = int(data['data']['user']['contributionsCollection']['contributionCalendar']['totalContributions'])
-        except (Exception, KeyError, TypeError) as e:
-            info(f'Unable to get total contributions: {e}')
+            response_data = response.json()
 
+            if 'errors' in response_data:
+                fatal(f'Error in the GraphQL response: {response_data["errors"]}')
+                return
 
+            user                   = response_data['data']['user']
+            contributions          = user['contributionsCollection']
+            self.data.total_issues = (user['issues']['totalCount'])
+            self.data.total_prs    = (user['pullRequests']['totalCount'])
 
-    def _process_data(self):
-        self._get_stars()
+            self.data.total_contributions = (
+                contributions['contributionCalendar']['totalContributions']
+            )
+
+            self.data.total_commits = (
+                contributions['totalCommitContributions']
+            )
+
+            self.data.total_issue_contributions = (
+                contributions['totalIssueContributions']
+            )
+
+            self.data.total_pr_contributions = (
+                contributions['totalPullRequestContributions']
+            )
+
+            self.data.total_pr_reviews = (
+                contributions['totalPullRequestReviewContributions']
+            )
+
+        except (KeyError, TypeError, ValueError) as e:
+            fatal(f'Unable to parse contributions data: {e}')
+
+        except Exception as e:
+            fatal(f'Unknown error while parsing contributions data: {e}')
 
 
 
     def _get_stars(self):
         for repo in self.data.repos:
             self.data.total_stars += repo.get('stargazers_count', 0)
-            
+
 
 
     def _display(self):
         print(f'repos: {self.data.len_repos}')
         print(f'stars: {self.data.total_stars}')
         print(f'commits: {self.data.total_commits}')
+        print(f'issues: {self.data.total_issues}')
+        print(f'pull requests: {self.data.total_prs}')
         print(f'contributions: {self.data.total_contributions}')
+        print(
+            f'issue contributions: '
+            f'{self.data.total_issue_contributions}'
+        )
+        print(
+            f'PR contributions: '
+            f'{self.data.total_pr_contributions}'
+        )
+        print(
+            f'PR reviews: '
+            f'{self.data.total_pr_reviews}'
+        )
 
+        for i in self.data.lang_bytes:
+            print(f'{i}: {self.data.lang_bytes[i]}')
