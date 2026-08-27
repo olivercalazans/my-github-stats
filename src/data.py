@@ -37,7 +37,7 @@ class Data:
 
 
 
-    def get_user_name(self):
+    def get_username(self):
         repo = os.getenv("GITHUB_REPOSITORY", None)
 
         if not repo:

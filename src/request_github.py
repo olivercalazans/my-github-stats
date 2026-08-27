@@ -63,7 +63,7 @@ class Fetcher:
             self._get_repo_languages()
             self._get_contributions()
             self._get_stars()
-            #self._display()
+            self._display()
         except Exception as e:
             fatal(str(e))
 

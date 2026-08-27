@@ -11,7 +11,7 @@
 # GNU Affero General Public License for more details.
 #
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://gnu.org>.
 
 from typing  import NamedTuple
 from data    import Data
@@ -44,7 +44,7 @@ class SVGBuilder:
             'Shell'      : '#89e051',
             'Java'       : '#b07219',
             'C++'        : '#f34b7d',
-            'C#'         : '#178600',
+            'C#'         : "#4E0086",
             'PHP'        : '#4F5D95',
             'Go'         : '#00ADD8',
             'TeX'        : '#3D6117',
@@ -55,9 +55,11 @@ class SVGBuilder:
     )
 
 
+
     def create_svg_cards(self):
         self._generate_languages_svg()
-    
+        self._generate_stats_svg()
+
     
     
     def _generate_languages_svg(self):
@@ -132,5 +134,52 @@ class SVGBuilder:
         svg_parts.append('</svg>')
 
         output_file = f'{self.STATIC.dir_path}/languages_stats.svg'
+        with open(output_file, 'w', encoding='utf-8') as f:
+            f.write('\n'.join(svg_parts))
+
+
+
+    def _generate_stats_svg(self):
+        width    = 300
+        height   = 160
+        x_offset = 20
+
+        stats = [
+            ("Total Stars", self.data.total_stars),
+            ("Total Commits", self.data.total_commits),
+            ("Total Issues", self.data.total_issues),
+            ("TotalPull Requests", self.data.total_prs),
+            ("Total Contributions", self.data.total_contributions)
+        ]
+
+        svg_parts = [
+            f'<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg">',
+            '  <style>',
+            '    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 13px; fill: #c9d1d9; }',
+            '    .title { font-weight: 600; font-size: 14px; fill: #58a6ff; }',
+            '    .val { font-weight: 600; fill: #c9d1d9; text-anchor: end; }',
+            '  </style>',
+            '  <!-- Fundo do GitHub Dark (sem bordas) -->',
+            '  <rect width="100%" height="100%" rx="6" fill="#0d1117"/>',
+            '  <!-- Título -->',
+            f'  <text x="{x_offset}" y="30" class="title">GitHub Stats</text>',
+        ]
+
+        start_y       = 60
+        line_spacing  = 22
+        max_content_w = width - x_offset
+
+        for idx, (label, val) in enumerate(stats):
+            y_pos = start_y + (idx * line_spacing)
+            svg_parts.append(
+                f'  <g transform="translate(0, {y_pos})">'
+                f'    <text x="{x_offset}" y="0">{label}</text>'
+                f'    <text x="{max_content_w}" y="0" class="val">{val}</text>'
+                f'  </g>'
+            )
+
+        svg_parts.append('</svg>')
+
+        output_file = f'{self.STATIC.dir_path}/github_stats.svg'
         with open(output_file, 'w', encoding='utf-8') as f:
             f.write('\n'.join(svg_parts))
