@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://gnu.org>.
 
+import os
 from typing  import NamedTuple
 from data    import Data
 from display import info
@@ -84,6 +85,7 @@ class SVGBuilder:
 
 
     def create_svg_cards(self):
+        os.makedirs(self.STATIC.DIR_PATH, exist_ok=True)
         self._generate_languages_svg()
         self._generate_stats_svg()
 
