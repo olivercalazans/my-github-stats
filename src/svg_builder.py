@@ -169,9 +169,9 @@ class SVGBuilder:
 
 
     def _generate_stats_svg(self):
-        width    = 300
+        width    = 260
         height   = 195
-        x_offset = 25
+        x_offset = 20
 
         stats = [
             ("Total Stars", self.data.total_stars),
@@ -195,8 +195,8 @@ class SVGBuilder:
         ]
 
         start_y      = 65
-        line_spacing = 25
-        value_x_pos  = width - (x_offset * 2)
+        line_spacing = 25        
+        value_x_pos  = 222
 
         for idx, (label, val) in enumerate(stats):
             y_pos = start_y + (idx * line_spacing)
