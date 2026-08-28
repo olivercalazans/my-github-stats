@@ -259,24 +259,17 @@ class Fetcher:
 
 
     def _display(self):
-        print(f'repos: {self.data.len_repos}')
-        print(f'stars: {self.data.total_stars}')
-        print(f'commits: {self.data.total_commits}')
-        print(f'issues: {self.data.total_issues}')
-        print(f'pull requests: {self.data.total_prs}')
-        print(f'contributions: {self.data.total_contributions}')
-        print(
-            f'issue contributions: '
-            f'{self.data.total_issue_contributions}'
-        )
-        print(
-            f'PR contributions: '
-            f'{self.data.total_pr_contributions}'
-        )
-        print(
-            f'PR reviews: '
-            f'{self.data.total_pr_reviews}'
-        )
+        info('GitHub information:')
+        print(f'- Total repositories.......: {self.data.len_repos}')
+        print(f'- Total stars..............: {self.data.total_stars}')
+        print(f'- Total commits............: {self.data.total_commits}')
+        print(f'- Total issues.............: {self.data.total_issues}')
+        print(f'- Total pull requests......: {self.data.total_prs}')
+        print(f'- Total contributions......: {self.data.total_contributions}')
+        print(f'- Total issue contributions: {self.data.total_issue_contributions}')
+        print(f'- PR contributions.........: {self.data.total_pr_contributions}')
+        print(f'- PR reviews...............: {self.data.total_pr_reviews}')
+        print('- Languages:')
 
         for i in self.data.lang_bytes:
-            print(f'{i}: {self.data.lang_bytes[i]}')
+            print(f'    - {i}: {self.data.lang_bytes[i]}')
