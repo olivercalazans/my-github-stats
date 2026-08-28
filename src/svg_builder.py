@@ -188,14 +188,14 @@ class SVGBuilder:
             '    .title { font-weight: 600; font-size: 16px; fill: #58a6ff; }',
             '    .bold { font-weight: 600; fill: #58a6ff; }',
             '  </style>',
-            '  <!-- Fundo do GitHub Dark com borda sutil padrão -->',
-            '  <rect width="100%" height="100%" rx="4.5" fill="#0d1117" stroke="#30363d" stroke-width="1"/>',
+            '  <!-- Fundo do GitHub Dark (sem bordas) -->',
+            '  <rect width="100%" height="100%" rx="6" fill="#0d1117"/>',
             '  <!-- Título -->',
             f'  <text x="{x_offset}" y="35" class="title">{self.data.USERNAME}\'s GitHub Stats</text>',
         ]
 
         start_y      = 65
-        line_spacing = 25        
+        line_spacing = 25
         value_x_pos  = width - (x_offset * 2)
 
         for idx, (label, val) in enumerate(stats):
