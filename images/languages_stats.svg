@@ -11,11 +11,11 @@
   <svg x="20" y="50" width="260" height="10">
     <mask id="bar-mask"><rect width="260" height="10" rx="5" fill="#fff"/></mask>
     <g mask="url(#bar-mask)">
-    <rect x="0" y="0" width="185.62095089277878" height="10" fill="#00ADD8" rx="2" ry="2"/>
-    <rect x="185.62095089277878" y="0" width="45.942904296223475" height="10" fill="#3572A5" rx="2" ry="2"/>
-    <rect x="231.56385518900225" y="0" width="19.97120634864898" height="10" fill="#3D6117" rx="2" ry="2"/>
-    <rect x="251.53506153765125" y="0" width="6.446134803448215" height="10" fill="#012456" rx="2" ry="2"/>
-    <rect x="257.98119634109946" y="0" width="2.0188036589005742" height="10" fill="#89e051" rx="2" ry="2"/>
+    <rect x="0" y="0" width="185.62176705928312" height="10" fill="#00ADD8" rx="2" ry="2"/>
+    <rect x="185.62176705928312" y="0" width="45.94240016152359" height="10" fill="#3572A5" rx="2" ry="2"/>
+    <rect x="231.5641672208067" y="0" width="19.97098720320589" height="10" fill="#3D6117" rx="2" ry="2"/>
+    <rect x="251.53515442401257" y="0" width="6.446064069560484" height="10" fill="#012456" rx="2" ry="2"/>
+    <rect x="257.98121849357307" y="0" width="2.018781506426927" height="10" fill="#89e051" rx="2" ry="2"/>
     </g>
   </svg>
   <g transform="translate(20, 85)">    <circle cx="4" cy="4" r="4" fill="#00ADD8"/>    <text x="14" y="8">Go (71.4%)</text>  </g>
