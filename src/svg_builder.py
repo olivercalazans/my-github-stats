@@ -360,16 +360,28 @@ class SVGBuilder:
         ]
 
         radar_angles = (-90, -18, 54, 126, 198)
+        radar_start_points = []
         radar_points = []
 
         for value, angle in zip(radar_values, radar_angles):
-            radius  = 24.96 if value <= 0 else min(156, 31.2 * (1 + math.log10(value)))
             radians = math.radians(angle)
+            radar_start_points.append(
+                f'{24.96 * math.cos(radians):.2f},{24.96 * math.sin(radians):.2f}'
+            )
+            radius  = 24.96 if value <= 0 else min(156, 31.2 * (1 + math.log10(value)))
             radar_points.append(f'{radius * math.cos(radians):.2f},{radius * math.sin(radians):.2f}')
-        
+
+        radar_start = ' '.join(radar_start_points)
+        radar_end = ' '.join(radar_points)
         svg = re.sub(
             r'(<polygon style="stroke-width: 4px; stroke: #47a042; fill: #47a042; fill-opacity: 0.5;" points=")[^"]+',
-            lambda match: match.group(1) + ' '.join(radar_points),
+            lambda match: match.group(1) + radar_end,
+            svg,
+            count=1,
+        )
+        svg = re.sub(
+            r'(<animate attributeName="points" values=")[^"]+',
+            lambda match: match.group(1) + f'{radar_start};{radar_end}',
             svg,
             count=1,
         )
