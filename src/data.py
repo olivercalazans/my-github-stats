@@ -34,6 +34,11 @@ class Data:
     total_issue_contributions : int            = 0
     total_pr_contributions    : int            = 0
     total_pr_reviews          : int            = 0
+    total_forks               : int            = 0
+    total_contributed_repos   : int            = 0
+    contribution_days         : list[dict]     = field(default_factory=list)
+    contribution_start        : str            = ''
+    contribution_end          : str            = ''
 
 
 

@@ -186,12 +186,21 @@ class Fetcher:
 
                         contributionCalendar {
                             totalContributions
+                            weeks {
+                                contributionDays {
+                                    contributionCount
+                                    date
+                                }
+                            }
                         }
 
                         totalCommitContributions
                         totalIssueContributions
                         totalPullRequestContributions
                         totalPullRequestReviewContributions
+                        totalRepositoriesWithContributedCommits
+                        startedAt
+                        endedAt
                     }
                 }
             }
@@ -227,7 +236,13 @@ class Fetcher:
             self.data.total_contributions = (
                 contributions['contributionCalendar']['totalContributions']
             )
-
+            self.data.contribution_days = [
+                day
+                for week in contributions['contributionCalendar']['weeks']
+                for day in week['contributionDays']
+            ]
+            self.data.contribution_start = contributions['startedAt'][:10]
+            self.data.contribution_end = contributions['endedAt'][:10]
             self.data.total_commits = (
                 contributions['totalCommitContributions']
             )
@@ -243,6 +258,9 @@ class Fetcher:
             self.data.total_pr_reviews = (
                 contributions['totalPullRequestReviewContributions']
             )
+            self.data.total_contributed_repos = (
+                contributions['totalRepositoriesWithContributedCommits']
+            )
 
         except (KeyError, TypeError, ValueError) as e:
             fatal(f'Unable to parse contributions data: {e}')
@@ -255,6 +273,7 @@ class Fetcher:
     def _get_stars(self):
         for repo in self.data.repos:
             self.data.total_stars += repo.get('stargazers_count', 0)
+            self.data.total_forks += repo.get('forks_count', 0)
 
 
 
@@ -262,7 +281,7 @@ class Fetcher:
         info('GitHub information:')
         print(f'- Total repositories.......: {self.data.len_repos}')
         print(f'- Total stars..............: {self.data.total_stars}')
-        print(f'- Total commits............: {self.data.total_commits}')
+        print(f'- Commits (12 months)......: {self.data.total_commits}')
         print(f'- Total issues.............: {self.data.total_issues}')
         print(f'- Total pull requests......: {self.data.total_prs}')
         print(f'- Total contributions......: {self.data.total_contributions}')

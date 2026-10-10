@@ -25,14 +25,17 @@ By moving to a self-hosted approach running on your own GitHub Actions:
 ## How to Use (Quick Start)
 
 1. **Fork** this repository.
-2. Generate a personal access token with public repository read permissions (`repo:public_repo` or `public_read`) and add it to your fork's **Settings > Secrets and variables > Actions > Repository secrets** as a secret named `TOKEN`.
+2. Generate a personal access token with public repository read permissions (`repo:public_repo` or `public_read`) and add it to your fork's **Settings > Secrets and variables > Actions > Repository secrets** as a secret named `TOKEN`. For a classic token, include `read:user` if you want GitHub to include private contribution counts that are enabled on your profile.
 3. Go to your fork's **Settings > Actions > General**, scroll down to **Workflow permissions**, select **Read and write permissions**, and save.
 4. The GitHub Actions workflow will automatically query the GitHub GraphQL API on schedule, generate your SVGs, and update your repository.
 5. Add the generated SVGs to your main profile README using standard Markdown:
 
 ```markdown
 <img src="https://raw.githubusercontent.com/<USERNAME>/my-github-stats/main/images/languages_stats.svg" />
+<img src="https://raw.githubusercontent.com/<USERNAME>/my-github-stats/main/images/profile-night-green.svg" />
 ```
+
+The workflow generates `images/profile-night-green.svg` from `templates/profile-night-green.svg`, preserving its artwork and animations while updating the language labels and GitHub counters. The date in the upper right is displayed slightly larger.
 
 <br>
 
