@@ -9,8 +9,8 @@
   <!-- Título -->
   <text x="20" y="35" class="title">olivercalazans's GitHub Stats</text>
   <g transform="translate(20, 65)">    <text x="0" y="0">Total Stars:</text>    <text x="222" y="0" class="bold" text-anchor="end">3</text>  </g>
-  <g transform="translate(20, 90)">    <text x="0" y="0">Commits (12 months):</text>    <text x="222" y="0" class="bold" text-anchor="end">723</text>  </g>
-  <g transform="translate(20, 115)">    <text x="0" y="0">Total Issues:</text>    <text x="222" y="0" class="bold" text-anchor="end">14</text>  </g>
+  <g transform="translate(20, 90)">    <text x="0" y="0">Commits (12 months):</text>    <text x="222" y="0" class="bold" text-anchor="end">724</text>  </g>
+  <g transform="translate(20, 115)">    <text x="0" y="0">Total Issues:</text>    <text x="222" y="0" class="bold" text-anchor="end">15</text>  </g>
   <g transform="translate(20, 140)">    <text x="0" y="0">Total Pull Requests:</text>    <text x="222" y="0" class="bold" text-anchor="end">117</text>  </g>
-  <g transform="translate(20, 165)">    <text x="0" y="0">Total Contributions:</text>    <text x="222" y="0" class="bold" text-anchor="end">835</text>  </g>
+  <g transform="translate(20, 165)">    <text x="0" y="0">Total Contributions:</text>    <text x="222" y="0" class="bold" text-anchor="end">838</text>  </g>
 </svg>
