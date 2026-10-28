@@ -92,6 +92,7 @@ class SVGBuilder:
         self._generate_languages_svg()
         self._generate_stats_svg()
         self._generate_contributions_svg()
+        self._generate_radar_svg()
 
 
 
@@ -541,5 +542,84 @@ class SVGBuilder:
         svg_parts.append('</svg>')
 
         output_file = f'{self.STATIC.DIR_PATH}/github_stats.svg'
+        with open(output_file, 'w', encoding='utf-8') as f:
+            f.write('\n'.join(svg_parts))
+
+
+
+    def _generate_radar_svg(self):
+        width = 400
+        height = 400
+        cx, cy = 200, 200
+        
+        angles = [-90, -18, 54, 126, 198]
+        categories = ["Commit", "Issue", "PullReq", "Review", "Repo"]
+        
+        values = [
+            self.data.total_commits,
+            self.data.total_issue_contributions,
+            self.data.total_pr_contributions,
+            self.data.total_pr_reviews,
+            self.data.total_contributed_repos,
+        ]
+        
+        def get_coords(angle_deg, radius):
+            rad = math.radians(angle_deg)
+            return cx + radius * math.cos(rad), cy + radius * math.sin(rad)
+            
+        svg_parts = [
+            f'<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg">',
+            '  <style>',
+            '    .grid { stroke: #30363d; stroke-width: 1; fill: none; }',
+            '    .axis { stroke: #30363d; stroke-width: 1; stroke-dasharray: 4; }',
+            '    .label { fill: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 13px; text-anchor: middle; dominant-baseline: middle; }',
+            '    .scale { fill: #8b949e; font-family: sans-serif; font-size: 10px; }',
+            '    .data { fill: #47a042; fill-opacity: 0.5; stroke: #47a042; stroke-width: 2px; stroke-linejoin: round; }',
+            '  </style>',
+            '  <rect width="100%" height="100%" rx="6" fill="#0d1117"/>', # Fundo escuro
+        ]
+        
+        grid_values = [10, 100, 1000, 10000]
+        for gv in grid_values:
+            r = 31.2 * (1 + math.log10(gv))
+            points = [f"{get_coords(a, r)[0]:.2f},{get_coords(a, r)[1]:.2f}" for a in angles]
+            svg_parts.append(f'  <polygon points="{" ".join(points)}" class="grid" />')
+            
+            lx, ly = get_coords(-90, r)
+            label = f"{gv//1000}K" if gv >= 1000 else str(gv)
+            svg_parts.append(f'  <text x="{lx + 5:.2f}" y="{ly + 4:.2f}" class="scale">{label}</text>')
+            
+        for a in angles:
+            x, y = get_coords(a, 156)
+            svg_parts.append(f'  <line x1="{cx}" y1="{cy}" x2="{x:.2f}" y2="{y:.2f}" class="axis" />')
+            
+        data_points = []
+        start_points = []
+        for v, a in zip(values, angles):
+            r = 24.96 if v <= 0 else min(156, 31.2 * (1 + math.log10(v)))
+            x, y = get_coords(a, r)
+            data_points.append(f"{x:.2f},{y:.2f}")
+            
+            sx, sy = get_coords(a, 24.96)
+            start_points.append(f"{sx:.2f},{sy:.2f}")
+            
+        svg_parts.append(
+            f'  <polygon points="{" ".join(data_points)}" class="data">\n'
+            f'    <animate attributeName="points" values="{" ".join(start_points)};{" ".join(data_points)}" dur="3s" repeatCount="1" fill="freeze"/>\n'
+            f'  </polygon>'
+        )
+        
+        label_radius = 175
+        for cat, a, v in zip(categories, angles, values):
+            x, y = get_coords(a, label_radius)
+            svg_parts.append(
+                f'  <text x="{x:.2f}" y="{y:.2f}" class="label">\n'
+                f'    {cat}<title>{v}</title>\n'
+                f'  </text>'
+            )
+            
+        svg_parts.append('</svg>')
+        
+        output_file = f'{self.STATIC.DIR_PATH}/radar_stats.svg'
         with open(output_file, 'w', encoding='utf-8') as f:
             f.write('\n'.join(svg_parts))
