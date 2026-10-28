@@ -11,18 +11,18 @@
   <svg x="20" y="50" width="260" height="10">
     <mask id="bar-mask"><rect width="260" height="10" rx="5" fill="#fff"/></mask>
     <g mask="url(#bar-mask)">
-    <rect x="0" y="0" width="139.93755123080692" height="10" fill="#00ADD8" rx="2" ry="2"/>
-    <rect x="139.93755123080692" y="0" width="77.10500519702207" height="10" fill="#3572A5" rx="2" ry="2"/>
-    <rect x="217.04255642782897" y="0" width="19.224756415998378" height="10" fill="#3D6117" rx="2" ry="2"/>
-    <rect x="236.26731284382734" y="0" width="15.584136829563027" height="10" fill="#dea584" rx="2" ry="2"/>
-    <rect x="251.85144967339036" y="0" width="6.205202092329533" height="10" fill="#012456" rx="2" ry="2"/>
-    <rect x="258.0566517657199" y="0" width="1.9433482342800645" height="10" fill="#89e051" rx="2" ry="2"/>
+    <rect x="0" y="0" width="138.9086806443901" height="10" fill="#00ADD8" rx="2" ry="2"/>
+    <rect x="138.9086806443901" y="0" width="78.44971416827792" height="10" fill="#3572A5" rx="2" ry="2"/>
+    <rect x="217.35839481266802" y="0" width="19.08340917765186" height="10" fill="#3D6117" rx="2" ry="2"/>
+    <rect x="236.4418039903199" y="0" width="15.46955671966682" height="10" fill="#dea584" rx="2" ry="2"/>
+    <rect x="251.91136070998672" y="0" width="6.159579242283801" height="10" fill="#012456" rx="2" ry="2"/>
+    <rect x="258.0709399522705" y="0" width="1.9290600477294937" height="10" fill="#89e051" rx="2" ry="2"/>
     </g>
   </svg>
-  <g transform="translate(20, 85)">    <circle cx="4" cy="4" r="4" fill="#00ADD8"/>    <text x="14" y="8">Go (53.8%)</text>  </g>
-  <g transform="translate(150, 85)">    <circle cx="4" cy="4" r="4" fill="#3572A5"/>    <text x="14" y="8">Python (29.7%)</text>  </g>
-  <g transform="translate(20, 105)">    <circle cx="4" cy="4" r="4" fill="#3D6117"/>    <text x="14" y="8">TeX (7.4%)</text>  </g>
-  <g transform="translate(150, 105)">    <circle cx="4" cy="4" r="4" fill="#dea584"/>    <text x="14" y="8">Rust (6.0%)</text>  </g>
+  <g transform="translate(20, 85)">    <circle cx="4" cy="4" r="4" fill="#00ADD8"/>    <text x="14" y="8">Go (53.4%)</text>  </g>
+  <g transform="translate(150, 85)">    <circle cx="4" cy="4" r="4" fill="#3572A5"/>    <text x="14" y="8">Python (30.2%)</text>  </g>
+  <g transform="translate(20, 105)">    <circle cx="4" cy="4" r="4" fill="#3D6117"/>    <text x="14" y="8">TeX (7.3%)</text>  </g>
+  <g transform="translate(150, 105)">    <circle cx="4" cy="4" r="4" fill="#dea584"/>    <text x="14" y="8">Rust (5.9%)</text>  </g>
   <g transform="translate(20, 125)">    <circle cx="4" cy="4" r="4" fill="#012456"/>    <text x="14" y="8">PowerShell (2.4%)</text>  </g>
   <g transform="translate(150, 125)">    <circle cx="4" cy="4" r="4" fill="#89e051"/>    <text x="14" y="8">Shell (0.7%)</text>  </g>
 </svg>
